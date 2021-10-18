@@ -7,8 +7,8 @@
 
 ## build docker image
 
-    docker build -t jenkins:jcasc .
+    make build
 
 ## run the image
 
-    docker run --name jenkins --rm -p 8080:8080 jenkins:jcasc
+    make run
