@@ -1,0 +1,53 @@
+---
+jenkins:
+  systemMessage: "This Jenkins instance is configured by the Configuration as Code Plugin"
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+       - id: ${JENKINS_ADMIN_ID}
+         password: ${JENKINS_ADMIN_PASSWORD}
+  authorizationStrategy:
+    globalMatrix:
+      permissions:
+        - "Overall/Administer:admin"
+        - "Overall/Read:authenticated"
+  remotingSecurity:
+    enabled: true
+security:
+  queueItemAuthenticator:
+    authenticators:
+    - global:
+        strategy: triggeringUsersAuthorizationStrategy
+unclassified:
+  location:
+    url: http://10.0.4.25:8080/
+tool:
+  nodejs:
+    installations:
+      - name: "NodeJS Latest"
+        properties:
+          - installSource:
+              installers:
+                - nodeJSInstaller:
+                    id: "12.11.1"
+                    npmPackagesRefreshHours: 48 #default is 72
+jobs:
+  - script: >
+      folder('testjobs')
+  - script: >
+      pipelineJob('testjobs/default-agent') {
+        definition {
+          cpsScm {
+            scm {
+              git {
+                remote {
+                  url('https://github.com/jenkinsci/job-dsl-plugin.git')
+                }
+                branch('*/master')
+              }
+            }
+            lightweight()
+          }
+        }
+      }
